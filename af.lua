@@ -3,6 +3,7 @@ pcall(function() game.CoreGui:FindFirstChild("AnimationSpy"):Destroy() end)
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local targetName = Players.LocalPlayer.Name
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "AnimationSpy"
@@ -11,7 +12,6 @@ gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = game.CoreGui
 
--- Main Frame with Glassmorphism style
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 320, 0, 280)
 frame.Position = UDim2.new(0, 25, 0, 130)
@@ -36,7 +36,6 @@ local blur = Instance.new("UIBlurEffect")
 blur.Parent = frame
 blur.Size = 4
 
--- Draggable Logic with eased movement
 do
 	local dragging, dragInput, dragStart, startPos
 	local function update(input)
@@ -64,7 +63,6 @@ do
 	end)
 end
 
--- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 40)
 titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -87,7 +85,6 @@ titleLabel.TextScaled = true
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = titleBar
 
--- Close Button
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
 closeBtn.Position = UDim2.new(1, -40, 0, 5)
@@ -113,7 +110,6 @@ closeBtn.MouseButton1Click:Connect(function()
 	gui:Destroy()
 end)
 
--- Scrollable list for animations
 local scroll = Instance.new("ScrollingFrame")
 scroll.Size = UDim2.new(1, -20, 1, -55)
 scroll.Position = UDim2.new(0, 10, 0, 45)
@@ -131,7 +127,6 @@ layout.Padding = UDim.new(0, 10)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = scroll
 
--- Notifications container (bottom right corner)
 local notifHolder = Instance.new("Frame")
 notifHolder.Size = UDim2.new(0, 300, 1, -50)
 notifHolder.Position = UDim2.new(1, -320, 0, 10)
@@ -144,7 +139,6 @@ notifLayout.SortOrder = Enum.SortOrder.LayoutOrder
 notifLayout.Padding = UDim.new(0, 10)
 notifLayout.Parent = notifHolder
 
--- Notification function with fade and slide
 local function notify(animName, animId)
 	local box = Instance.new("Frame")
 	box.Size = UDim2.new(0, 280, 0, 0)
@@ -170,11 +164,9 @@ local function notify(animName, animId)
 	label.ZIndex = 31
 	label.Parent = box
 
-	-- Animate in
 	TweenService:Create(box, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 280, 0, 40), BackgroundTransparency = 0}):Play()
 
 	task.delay(3, function()
-		-- Animate out
 		TweenService:Create(box, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 280, 0, 0), BackgroundTransparency = 1}):Play()
 		task.wait(0.3)
 		box:Destroy()
@@ -224,7 +216,6 @@ local function addAnim(name, id)
 	btnCorner.CornerRadius = UDim.new(0, 8)
 	btnCorner.Parent = copyBtn
 
-	-- Hover effect for copy button
 	copyBtn.MouseEnter:Connect(function()
 		TweenService:Create(copyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(95, 160, 255)}):Play()
 	end)
@@ -232,18 +223,15 @@ local function addAnim(name, id)
 		TweenService:Create(copyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(75, 140, 255)}):Play()
 	end)
 
-	-- Click animation & copy logic
 	copyBtn.MouseButton1Click:Connect(function()
 		setclipboard("rbxassetid://" .. id)
 		notify(name, id)
 
-		-- Brief flash animation on click
 		TweenService:Create(item, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(105, 180, 255)}):Play()
 		task.wait(0.15)
 		TweenService:Create(item, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(38, 38, 38)}):Play()
 	end)
 
-	-- Animate item fade-in and slide from left
 	item.Position = UDim2.new(0, -320, item.Position.Y.Scale, item.Position.Y.Offset)
 	item.BackgroundTransparency = 1
 	TweenService:Create(item, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -252,8 +240,6 @@ local function addAnim(name, id)
 	}):Play()
 end
 
--- Replace this with your desired target username
-local targetName = "GeekyMain"
 local plr = game.Players:FindFirstChild(targetName)
 
 if plr then
@@ -269,8 +255,6 @@ if plr then
 				end
 			end
 		end)
-
-		-- Disconnect when character dies to avoid memory leaks
 		char:WaitForChild("Humanoid").Died:Connect(function()
 			if animConnection then
 				animConnection:Disconnect()
